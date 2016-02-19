@@ -105,7 +105,27 @@ SELECT AVG(TIMESTAMPDIFF(YEAR,birthday,CURDATE()))
 ```
 
 - cp8
-mysqlbinlog
+mysqlbinlog  
+in [mysqld] or [server] sections of file (my.cnf or my.ini)
+```
+log_bin = /var/log/mysql/mariadb-bin
+```
+show a single log:
+```
+mysqlbinlog /var/log/mysql/mariadb-bin.000001
+```
+
+error log:
+```
+log_error = /var/log/mysql/error.log
+```
+
+
+set log file
+```
+general_log = 1
+general_log_file = /var/log/mysql/mysql.log
+```
 
 export tab indented files.
 ```
@@ -117,4 +137,41 @@ mysqlimport
 ```
 mysqlimport --local -u root -p test /dest/table.txt
 ```
+
+hotcopy, copy database to path
+```
+mysqlhotcopy db_name [/path]
+```
+
+select table
+```
+SELECT TABLE_NAME,ENGINE FROM information_schema.tables WHERE TABLE_SCHEMA="test";
+```
+
+using xtrabackup
+```
+xtrabackup --backup --datadir=/var/lib/mysql/ --target-dir=/path/to/backup/
+```
+
+To restore it, we must prepare it first.
+```
+xtrabackup --prepare --target-dir=/path/to/backup/
+```
+
+restore
+```
+rsync -avP /path/to/backup/ /var/lib/mysql/
+chown -R mysql:mysql /var/lib/mysql/
+```
+
+repair
+```
+mysqlcheck -u root -p test
+```
+multiple databases
+```
+mysqlcheck -u root -p --databases db_name1 db_name2 db_name3
+mysqlcheck -u root -p --all-databases
+```
+
 
